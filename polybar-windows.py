@@ -1,7 +1,6 @@
 #!/usr/bin/python3
-import subprocess
+import listen
 import os
-import re
 
 COLOR1 = "ffffff"
 UNFOCUSED_COLOR = "777777"
@@ -26,12 +25,10 @@ def format_title(title):
     if 'Chrome' in title:
         return title.split('-')[-1].strip()
 
-    # if re.match(r'\bvi', title) or re.match(r'\bfish', title):
-        # return title.split()[0] + " " + title.split('/')[-1]
-
     return title
 
-def print_current_windows():
+
+def print_current_windows(update):
     current_display = os.popen(CURRENT_DISPLAY_CMD).read().split()[0]
     active_window = os.popen(ACTIVE_WINDOW_CMD).read().strip()
     windows = os.popen('wmctrl -lx').read().strip().split("\n")
@@ -55,18 +52,6 @@ def print_current_windows():
     print("".join(output)[5:], flush=True)
 
 
-def main():
-    print_current_windows()
-
-    cmd = 'bspc subscribe node'
-    p = subprocess.Popen(cmd, shell=True,
-                         stdout=subprocess.PIPE,
-                         stderr=subprocess.STDOUT)
-
-    while True:
-        p.stdout.readline()
-        print_current_windows()
-
-
 if __name__ == '__main__':
-    main()
+    print_current_windows("")
+    listen.setup_loop(cmd='bspc subscribe node', func=print_current_windows)
