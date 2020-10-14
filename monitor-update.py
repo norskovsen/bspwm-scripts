@@ -5,14 +5,15 @@ import listen
 
 INTERVAL = 2
 
-last_update = time.time()
+last_update = 0
 
 
 def update_monitor(update):
     global last_update
     current_time = time.time()
-    if (last_update - current_time) <= INTERVAL:
+    if abs(last_update - current_time) <= INTERVAL:
         return
+    time.sleep(2)
     last_update = current_time
     time.sleep(2)
     os.system('~/.config/autorandr/postswitch')

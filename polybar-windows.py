@@ -12,6 +12,7 @@ INACTIVE_DECORATION_LEFT = "%{O5}%{F#" + UNFOCUSED_COLOR + \
 INACTIVE_DECORATION_RIGHT = "%{-u}%{F-}%{O5}"
 
 CURRENT_DISPLAY_CMD = 'wmctrl -d | grep "*"'
+WINDOWS_CMD = 'wmctrl -lx'
 ACTIVE_WINDOW_CMD = "xprop -root _NET_ACTIVE_WINDOW|cut -d ' ' -f 5|sed -e 's/../0&/2'"
 
 
@@ -21,7 +22,7 @@ def get_short_title(title):
     return title
 
 
-def format_title(title):
+def format_title(process_name, title):
     if 'Chrome' in title:
         return title.split('-')[-1].strip()
 
@@ -31,13 +32,16 @@ def format_title(title):
 def print_current_windows(update):
     current_display = os.popen(CURRENT_DISPLAY_CMD).read().split()[0]
     active_window = os.popen(ACTIVE_WINDOW_CMD).read().strip()
-    windows = os.popen('wmctrl -lx').read().strip().split("\n")
+    windows = os.popen(WINDOWS_CMD).read().strip().split("\n")
     output = []
     for window_info in windows:
-        window, display, process_name, user, *title = window_info.split()
+        try:
+            window, display, process_name, user, *title = window_info.split()
+        except Exception:
+            continue
         title = " ".join(title)
 
-        title = format_title(title)
+        title = format_title(process_name, title)
 
         if display != current_display:
             continue
@@ -49,9 +53,14 @@ def print_current_windows(update):
         title = get_short_title(title)
         output.append(INACTIVE_DECORATION_LEFT + title + INACTIVE_DECORATION_RIGHT)
 
-    print("".join(output)[5:], flush=True)
+    if len(output) > 0:
+        output = "".join(output)[5:]
+    else:
+        output = " "
+
+    print(output, flush=True)
 
 
 if __name__ == '__main__':
     print_current_windows("")
-    listen.setup_loop(cmd='bspc subscribe node', func=print_current_windows)
+    listen.setup_loop(cmd="bspc subscribe node", func=print_current_windows)
