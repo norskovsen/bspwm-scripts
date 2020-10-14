@@ -101,9 +101,7 @@ def handle_change(new_state):
 
 def setup_loop(func):
     root.change_attributes(event_mask=Xlib.X.PropertyChangeMask)
-
     get_window_name(get_active_window()[0])
-    handle_change(last_seen)
 
     while True:  # next_event() sleeps until we get an event
         handle_xevent(func, disp.next_event())
