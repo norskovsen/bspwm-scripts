@@ -71,7 +71,7 @@ def print_current_windows(update):
 if __name__ == '__main__':
     print_current_windows("")
 
-    title_thread = threading.Thread(target=titlehandler.setup_loop, 
+    title_thread = threading.Thread(target=titlehandler.setup_loop,
                                     args=(print_current_windows,))
     title_thread.start()
 
@@ -83,6 +83,4 @@ if __name__ == '__main__':
         title_thread.join()
         node_thread.join()
     except Exception:
-        print("hi")
         pass
-    # titlehandler.setup_loop(func=print_current_windows)
